@@ -65,7 +65,9 @@ td { vertical-align: top; }
 /* ==|== primary styles =====================================================
    Author: crisgarner
    ========================================================================== */
-
+body,html,#container,#main,#dragzone{
+  height:100%;
+}
 [draggable] {
   -moz-user-select: none;
   -khtml-user-select: none;
@@ -87,16 +89,20 @@ header,body,html,#main{
 
 #dragzone{
   display: block;
-  height:700px;
   background-color:purple;
-  width:700px;
-  margin:200px;
+  margin-left :200px;
 }
 
 #dragarea{
-  widht:150px;
+  width:150px;
   margin: 0 0px 0px 0px;
   padding: 0px 0px 0px 0px;
+  float: left;
+  height:100%;
+}
+
+#dragarea ul {
+  padding: 0;
 }
 
 
@@ -120,7 +126,8 @@ li{
   height:120px;
   display: block;
   float:left;
-  margin-left:40px;
+  margin-left:20px;
+  margin-right:20px;
   background:yellow;
 }
 
@@ -129,7 +136,8 @@ li{
   height:120px;
   display: block;
   float:left;
-  margin-left:40px;
+  margin-left:20px;
+  margin-right:20px;
   background:red;
 }
 
@@ -138,8 +146,14 @@ li{
   height:120px;
   display: block;
   float:left;
-  margin-left:40px;
+  margin-left:20px;
+  margin-right:20px;
   background:blue;
+}
+
+#dragzone .blue-drag,#dragzone .red-drag,#dragzone .yellow-drag{
+  position: absolute;
+  margin:0;
 }
 
 
