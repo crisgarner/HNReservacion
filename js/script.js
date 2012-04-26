@@ -79,6 +79,7 @@ document.getElementById('testo').ondrop = soltar;
 //variables
 
 var dragSrcEl = null;
+var moveDiv = null;
 var pickX = null;
 var pickY = null;
 var cols = document.querySelectorAll('ul .drag-item');
@@ -94,18 +95,25 @@ dragzone.addEventListener('dragover',handleDragOver,false);
 dragzone.addEventListener('dragleave',handleDragLeave,false);
 dragzone.addEventListener('drop',handleDrop,false);
 
+var dragarea = document.getElementById('dragarea');
+dragarea.addEventListener('drop',drop_move,false);
+dragarea.addEventListener('dragenter',handleDragEnter,false);
+dragarea.addEventListener('dragover',handleDragOver,false);
+
+
 
 //cuando agarra el elemento
 function handleDragStart(e) {
+  moveDiv = null;
   if(e.target.classList[1] == "drag-item"){
     this.style.opacity = '0.4';
     dragSrcEl = e;
     var style = window.getComputedStyle(e.target, null);
     pickX =  e.offsetX;
     pickY =  e.offsetY;
-    console.log(pickX);
   }else{
     dragSrcEl = null;
+    moveDiv = null;
   }
 }
 
@@ -114,7 +122,7 @@ function handleDragOver(e) {
   if (e.preventDefault) {
     e.preventDefault(); // Necessary. Allows us to drop.
   }
-  if(this.id=="dragzone" && dragSrcEl != null && e.offsetX > pickX){
+  if(this.id=="dragzone" && (dragSrcEl != null || moveDiv != null) && e.offsetX > pickX){
     this.classList.add('over');
   }else{
     dragzone.classList.remove('over');
@@ -148,31 +156,48 @@ function handleDrop(e) {
     e.stopPropagation(); // Stops some browsers from redirecting.
   }
   // Don't do anything if dropping the same column we're dragging.
-  if (e.target.id == "dragzone" && e.offsetX > pickX) {
+  if (e.target.id == "dragzone" && e.offsetX > pickX && dragSrcEl != null) {
     // Set the source column's HTML to the HTML of the columnwe dropped on.
     var newdiv = document.createElement('div');
-    newdiv.setAttribute('class', dragSrcEl.target.classList[0]);
-    newdiv.setAttribute('draggable',"false");
+    newdiv.setAttribute('class', dragSrcEl.target.classList[0] + " move-item");
+    newdiv.setAttribute('draggable',"true");
     newdiv.style.left = (event.clientX-pickX) + 'px';
     newdiv.style.top = (event.clientY-pickY)+'px';
 
     dragzone.appendChild(newdiv);
 
-    newdiv.addEventListener('dragstart',drag_start_move,false);
-    dragzone.addEventListener('dragover',drag_over_move,false);
-    dragzone.addEventListener('drop',drop_move,false);
+    var divs_nuevos = document.querySelectorAll('.move-item');
+    [].forEach.call(divs_nuevos, function(div_individual) {
+      div_individual.addEventListener('dragstart', drag_start_move, false);
+      div_individual.addEventListener('dragend', handleDragEnd, false);
+    });
+
+
+
     dragSrcEl = null;
+    moveDiv = null;
     pickX = 0;
     pickY = 0;
   }
 
+  if(e.target.id == "dragzone" && moveDiv != null){
+    if(e.offsetX > pickX){
+      var offset = e.dataTransfer.getData("text/plain").split(',');
+      moveDiv.style.left = (e.clientX + parseInt(offset[0],10)) + 'px';
+      moveDiv.style.top = (e.clientY + parseInt(offset[1],10)) + 'px';
+      moveDiv = null;
+      dragSrcEl = null;
+      pickX = 0;
+      pickY = 0;
+    }
+    e.preventDefault();
+  }
   return false;
 }
 
 function handleDragEnd(e) {
   // this/e.target is the source node.
     this.style.opacity = '1';
-
     dragzone.classList.remove('over');
 
     //obtengo el color y creo el div
@@ -182,7 +207,11 @@ function handleDragEnd(e) {
 
 
 function drag_start_move(event) {
-
+  this.style.opacity = '0.4';
+  dragSrcEl = null;
+  moveDiv = event.target;
+  pickX =  event.offsetX;
+  pickY =  event.offsetY;
     var style = window.getComputedStyle(event.target, null);
     event.dataTransfer.setData("text/plain",
     (parseInt(style.getPropertyValue("left"),10) - event.clientX) + ',' + (parseInt(style.getPropertyValue("top"),10) - event.clientY));
@@ -193,13 +222,17 @@ function drag_over_move(event) {
     return false;
 }
 
-function drop_move(event) {
-    var offset = event.dataTransfer.getData("text/plain").split(',');
-    var dm = document.getElementById(this.id);
-    dm.style.left = (event.clientX + parseInt(offset[0],10)) + 'px';
-    dm.style.top = (event.clientY + parseInt(offset[1],10)) + 'px';
-    event.preventDefault();
+function drop_move(e) {
+  if(this.id == "dragarea" && moveDiv != null){
+
+    dragzone.removeChild(moveDiv);
+    moveDiv = null;
+    pickX = 0;
+    pickY = 0;
     return false;
+  }
+   moveDiv = null;
+   dragSrcEl = null;
 }
 
 
