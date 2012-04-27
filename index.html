@@ -29,9 +29,9 @@
     <div id="main" role="main" class="clearfix">
       <div id ="dragarea" class="clearfix">
         <ul>
-          <li class="red-drag drag-item" draggable="true"></li>
-          <li class="blue-drag drag-item" draggable="true"></li>
-          <li class="yellow-drag drag-item" draggable="true"></li>
+          <li id="drag1" class="red-drag drag-item"></li>
+          <li id="drag2" class="blue-drag drag-item" ></li>
+          <li id="drag3" class="yellow-drag drag-item" ></li>
         </ul>
       </div>
       <div id ="dragzone"></div>
@@ -44,10 +44,11 @@
 
 
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
 
 
   <!-- scripts concatenated and minified via ant build script-->
+  <script defer src="js/jquery-ui-1.8.19.custom.min.js"></script>
   <script defer src="js/script.js"></script>
   <!-- end scripts-->
 
